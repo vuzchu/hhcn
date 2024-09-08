@@ -2,7 +2,7 @@
 // Kết nối đến cơ sở dữ liệu
 include 'db_connect.php';
 
-// Lấy episode_id từ URL
+// Lấy episode_id và movie_id từ URL
 $episode_id = isset($_GET['episode_id']) ? intval($_GET['episode_id']) : 0;
 $movie_id = isset($_GET['movie_id']) ? intval($_GET['movie_id']) : 0;
 
@@ -37,6 +37,12 @@ if (!$result_all_episodes) {
 }
 
 $all_episodes = mysqli_fetch_all($result_all_episodes, MYSQLI_ASSOC);
+
+// Truy vấn để lấy tên phim
+$sql_movie = "SELECT title FROM movies WHERE movie_id = $movie_id";
+$result_movie = mysqli_query($conn, $sql_movie);
+$movie = mysqli_fetch_assoc($result_movie);
+$movie_title = $movie['title'];
 ?>
 
 <!DOCTYPE html>
@@ -86,17 +92,33 @@ $all_episodes = mysqli_fetch_all($result_all_episodes, MYSQLI_ASSOC);
             border: none;
             /* Remove border */
         }
+
+        .episode-item.active {
+            background-color: red;
+            /* Màu đỏ cho tập đang xem */
+            color: white;
+        }
+
+        /* Style for movie title link */
+        .anime__movie__title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .anime__movie__title a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
 
-
     <!-- Header Section Begin -->
     <!-- Include the header -->
     <?php include 'header.php'; ?>
     <!-- Header End -->
-
 
     <!-- Anime Section Begin -->
     <section class="anime-details spad">
@@ -104,6 +126,12 @@ $all_episodes = mysqli_fetch_all($result_all_episodes, MYSQLI_ASSOC);
             <div class="row">
                 <div class="col-lg-12">
                     <div class="anime__video__player">
+                        <!-- Hiển thị tiêu đề phim với liên kết đến movie_detail.php -->
+                        <div class="anime__movie__title">
+                            <a href="movie_detail.php?id=<?= $movie_id ?>">
+                                <?= htmlspecialchars($movie_title) ?>
+                            </a>
+                        </div>
                         <div class="video-player">
                             <iframe src="<?= htmlspecialchars($episode['source']) ?>"
                                 allowfullscreen
@@ -111,7 +139,6 @@ $all_episodes = mysqli_fetch_all($result_all_episodes, MYSQLI_ASSOC);
                                 allow="web-share">
                             </iframe>
                         </div>
-
                     </div>
 
                     <div class="anime__details__episodes">

@@ -82,7 +82,7 @@ $movies = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <div class="row">
                 <?php if (!empty($movies)): ?>
                     <?php foreach ($movies as $movie): ?>
-                        <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="product__item">
                                 <div class="product__item__pic set-bg" data-setbg="<?= htmlspecialchars($movie['image_url']) ?>">
                                     <div class="ep"><?= htmlspecialchars($movie['release_year']) ?></div>

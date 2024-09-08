@@ -10,9 +10,13 @@ if (session_status() == PHP_SESSION_NONE) {
 $genre_sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_name ASC";
 $genre_result = mysqli_query($conn, $genre_sql);
 
+
+
+
 // Lưu tất cả các thể loại vào một mảng
 $genres = mysqli_fetch_all($genre_result, MYSQLI_ASSOC);
 ?>
+
 
 <header class="header">
     <div class="container">
@@ -29,7 +33,7 @@ $genres = mysqli_fetch_all($genre_result, MYSQLI_ASSOC);
                     <nav class="header__menu mobile-menu">
                         <ul>
                             <li class="active"><a href="index.php">Homepage</a></li>
-                            <li><a href="./categories.php">Categories <span class="arrow_carrot-down"></span></a>
+                            <li><a href="">Categories <span class="arrow_carrot-down"></span></a>
                                 <ul class="dropdown">
                                     <?php if (!empty($genres)): ?>
                                         <?php foreach ($genres as $genre): ?>
@@ -48,24 +52,22 @@ $genres = mysqli_fetch_all($genre_result, MYSQLI_ASSOC);
             </div>
             <div class="col-lg-2">
                 <div class="header__right">
-                    <a href="#" class="search-switch"><span class="icon_search"></span></a>
+                    <a class="search-switch"><span class="icon_search"></span></a>
                     <?php if (isset($_SESSION['email'])): ?>
-                        <div class="dropdown user-dropdown">
-                            <a href="#" class="dropdown-toggle">
-                                <span class="icon_profile"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="profile.php">View Profile</a></li>
-                                <li><a href="favorite_movies.php">Favorite Movies</a></li>
-                                <li><a href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
-                            </ul>
-                        </div>
+                        <a href="#" class="dropdown-toggle" id="profileToggle">
+                            <span class="icon_profile"></span>
+                        </a>
+                        <ul class="dropdown">
+                            <li><a href="viewprofile.php">View Profile</a></li>
+                            <li><a href="follow_movie.php">Favorite Movies</a></li>
+                            <li><a href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
+                        </ul>
                     <?php else: ?>
                         <a href="login.php"><span class="icon_profile"></span></a>
                     <?php endif; ?>
                 </div>
-            </div>
 
+            </div>
         </div>
         <div id="mobile-menu-wrap"></div>
     </div>
@@ -83,36 +85,36 @@ $genres = mysqli_fetch_all($genre_result, MYSQLI_ASSOC);
 <!-- Search model end -->
 
 <style>
-    .user-dropdown {
-        position: relative;
-    }
-
-    .user-dropdown .dropdown-menu {
+    /* Ẩn menu thả xuống ban đầu */
+    .header__right .dropdown {
         display: none;
         position: absolute;
-        right: 0;
-        background-color: #fff;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        padding: 10px 0;
-        list-style: none;
+        background-color: #333;
+        /* Màu nền tùy chọn */
+        list-style-type: none;
+        padding: 10px;
+        margin: 0;
         z-index: 1000;
-        min-width: 150px;
+        /* Đảm bảo menu hiển thị phía trên các thành phần khác */
     }
 
-    .user-dropdown:hover .dropdown-menu {
+    /* Hiển thị menu khi hover vào icon profile */
+    .header__right:hover .dropdown {
         display: block;
     }
 
-    .user-dropdown .dropdown-menu li {
-        padding: 10px 20px;
+    /* Định dạng cho các mục trong dropdown */
+    .header__right .dropdown li {
+        margin: 5px 0;
     }
 
-    .user-dropdown .dropdown-menu li a {
-        color: #333;
+    .header__right .dropdown li a {
+        color: white;
+        /* Màu chữ */
         text-decoration: none;
     }
 
-    .user-dropdown .dropdown-menu li a:hover {
-        color: #ff6b6b;
+    .header__right .dropdown li a:hover {
+        text-decoration: underline;
     }
 </style>

@@ -2,6 +2,32 @@
 // Kết nối đến cơ sở dữ liệu
 include 'db_connect.php';
 
+// Truy vấn để chọn 3 bộ phim gần đây nhất
+$hero_sql = "SELECT m.movie_id, m.title, m.description, m.image_url, m.release_year
+             FROM movies m
+             ORDER BY m.created_at DESC
+             LIMIT 3";
+
+$hero_result = mysqli_query($conn, $hero_sql);
+
+if (!$hero_result) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+// Lấy các bộ phim để hiện thị trong phần hero
+$hero_movies = mysqli_fetch_all($hero_result, MYSQLI_ASSOC);
+
+// Truy vấn để lấy tất cả các thể loại (genres)
+$genre_sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_name ASC";
+$genre_result = mysqli_query($conn, $genre_sql);
+
+if (!$genre_result) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+// Lưu tất cả các thể loại vào một mảng
+$genres = mysqli_fetch_all($genre_result, MYSQLI_ASSOC);
+
 // Truy vấn để chọn tất cả các bộ phim và thể loại của chúng
 $sql = "SELECT m.movie_id, m.title, m.description, m.release_year, m.image_url, m.created_at, m.updated_at, 
                GROUP_CONCAT(g.genre_name SEPARATOR ', ') AS genres, 
@@ -12,14 +38,7 @@ $sql = "SELECT m.movie_id, m.title, m.description, m.release_year, m.image_url, 
         GROUP BY m.movie_id, m.title, m.description, m.release_year, m.image_url, m.created_at, m.updated_at
         ORDER BY m.updated_at DESC";
 
-
-// Truy vấn để lấy tất cả các thể loại (genres)
-$genre_sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_name ASC";
-$genre_result = mysqli_query($conn, $genre_sql);
-
-// Lưu tất cả các thể loại vào một mảng
-$genres = mysqli_fetch_all($genre_result, MYSQLI_ASSOC);
-
+// Lấy tất cả các bộ phim
 $result = mysqli_query($conn, $sql);
 
 if (!$result) {
@@ -29,6 +48,8 @@ if (!$result) {
 // Lấy tất cả các bộ phim dưới dạng mảng liên kết
 $movies = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -72,45 +93,28 @@ $movies = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <section class="hero">
         <div class="container">
             <div class="hero__slider owl-carousel">
-                <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="hero__text">
-                                <div class="label">Adventure</div>
-                                <h2>Fate / Stay Night: Unlimited Blade Works</h2>
-                                <p>After 30 days of travel across the world...</p>
-                                <a href="#"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
+                <?php if (!empty($hero_movies)): ?>
+                    <?php foreach ($hero_movies as $movie): ?>
+                        <div class="hero__items set-bg" data-setbg="<?= htmlspecialchars($movie['image_url']) ?>">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="hero__text">
+                                        <div class="label">Adventure</div> <!-- You might want to update the label dynamically based on the genre -->
+                                        <h2><?= htmlspecialchars($movie['title']) ?></h2>
+                                        <p><?= htmlspecialchars($movie['description']) ?></p>
+                                        <a href="movie_detail.php?id=<?= $movie['movie_id'] ?>"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="hero__text">
-                                <div class="label">Adventure</div>
-                                <h2>Fate / Stay Night: Unlimited Blade Works</h2>
-                                <p>After 30 days of travel across the world...</p>
-                                <a href="#"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="hero__text">
-                                <div class="label">Adventure</div>
-                                <h2>Fate / Stay Night: Unlimited Blade Works</h2>
-                                <p>After 30 days of travel across the world...</p>
-                                <a href="#"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No movies available for the hero section</p>
+                <?php endif; ?>
             </div>
         </div>
     </section>
+
 
     <section class="product spad">
         <div class="container">
